@@ -11,7 +11,7 @@ class Pembayaran extends Model
 
     protected $fillable = [
         'penjualan_id',
-        'pembelian_id',
+        'pembelian_id', 'piutang_id', 'utang_id',
         'user_id',
         'arah',
         'jumlah',

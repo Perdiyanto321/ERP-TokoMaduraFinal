@@ -8,6 +8,7 @@ use App\Models\Pembayaran;
 use App\Models\Pembelian;
 use App\Models\PenerimaanBarang;
 use App\Models\Produk;
+use App\Models\Utang;
 use App\Support\NomorDokumen;
 use DomainException;
 use Illuminate\Support\Facades\DB;
@@ -210,6 +211,25 @@ class PembelianService
                     'tanggal' => now(),
                     'metode' => 'tunai',
                 ]);
+            } elseif ($po->jenis_bayar === 'kredit' && $nilaiPenerimaanIni > 0) {
+                $utang = Utang::where('pembelian_id', $po->id)->lockForUpdate()->first();
+                if ($utang) {
+                    $utang->jumlah = round((float) $utang->jumlah + $nilaiPenerimaanIni, 2);
+                    $utang->sisa = round((float) $utang->sisa + $nilaiPenerimaanIni, 2);
+                    if ($utang->status === 'lunas') {
+                        $utang->status = 'sebagian';
+                    }
+                    $utang->save();
+                } else {
+                    Utang::create([
+                        'supplier_id' => $po->supplier_id,
+                        'pembelian_id' => $po->id,
+                        'jumlah' => $nilaiPenerimaanIni,
+                        'sisa' => $nilaiPenerimaanIni,
+                        'jatuh_tempo' => $po->jatuh_tempo,
+                        'status' => 'belum_lunas',
+                    ]);
+                }
             }
 
             $this->logService->catat('terima_barang_po', 'penerimaan_barang', $penerimaan->id, [
