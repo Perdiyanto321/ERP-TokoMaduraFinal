@@ -12,36 +12,27 @@ class ReturPenjualan extends Model
 
     protected $fillable = [
         'penjualan_id',
-        'diajukan_oleh',
-        'disetujui_oleh',
+        'diproses_oleh',
         'nomor',
         'tanggal',
+        'penyelesaian',
+        'total_retur',
         'alasan',
-        'status',
-        'nilai_refund',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'tanggal' => 'datetime',
-            'nilai_refund' => 'decimal:2',
-        ];
-    }
+    protected $casts = [
+        'tanggal' => 'datetime',
+        'total_retur' => 'decimal:2',
+    ];
 
     public function penjualan(): BelongsTo
     {
         return $this->belongsTo(Penjualan::class, 'penjualan_id');
     }
 
-    public function pengaju(): BelongsTo
+    public function pemroses(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'diajukan_oleh');
-    }
-
-    public function penyetuju(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'disetujui_oleh');
+        return $this->belongsTo(User::class, 'diproses_oleh');
     }
 
     public function detail(): HasMany

@@ -12,16 +12,15 @@ class DetailRetur extends Model
     protected $fillable = [
         'retur_id',
         'detail_penjualan_id',
-        'qty',
+        'qty_retur',
         'kondisi',
+        'subtotal',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'qty' => 'integer',
-        ];
-    }
+    protected $casts = [
+        'qty_retur' => 'integer',
+        'subtotal' => 'decimal:2',
+    ];
 
     public function retur(): BelongsTo
     {
